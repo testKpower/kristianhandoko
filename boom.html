@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FINAL BOSS LOVE CHAOS 😈🤣</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Comic Sans MS, cursive;
+    overflow: hidden;
+    text-align: center;
+    animation: bgFlash 0.8s infinite alternate;
+}
+
+@keyframes bgFlash {
+    0% { background: #ff9a9e; }
+    25% { background: #a18cd1; }
+    50% { background: #fbc2eb; }
+    75% { background: #fad0c4; }
+    100% { background: #ffdde1; }
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    width: 430px;
+    margin: 60px auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    animation: shake 0.5s infinite alternate;
+    position: relative;
+}
+
+@keyframes shake {
+    from { transform: rotate(-1deg); }
+    to { transform: rotate(1deg); }
+}
+
+button {
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    margin: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.answerBtn {
+    background: #ff4d6d;
+    color: white;
+    width: 95%;
+}
+
+.answerBtn:hover {
+    transform: scale(1.1) rotate(2deg);
+}
+
+#yesBtn {
+    background: #ff4d6d;
+    color: white;
+    position: relative;
+}
+
+#noBtn {
+    background: black;
+    color: white;
+    position: absolute;
+}
+
+.fall {
+    position: fixed;
+    top: -20px;
+    font-size: 22px;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+#result {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ff0077;
+    margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>FINAL BOSS LOVE TEST 😈🤣</h2>
+    <div id="quiz"></div>
+    <div id="result"></div>
+</div>
+
+<script>
+const questions = [
+{
+q:"1. Kalau kita jadi mie instan?",
+a:["Direbus penuh cinta 🍜","Dimakan sambil tatap-tatapan 😳","Dipajang karena terlalu berharga 🤣"]
+},
+{
+q:"2. Kalau aku jadi alien 👽?",
+a:["Ikut jadi alien juga 😆","Bikin kerajaan cinta 💕","LDR beda galaksi 😭"]
+},
+{
+q:"3. Kalau kita tersesat di hutan?",
+a:["Bangun villa absurd 🌲","Selfie dulu 📸","Teriak 'kita kuat!' 🤣"]
+},
+{
+q:"4. Kalau aku ngambek level 999?",
+a:["Peluk sampai restart 🤗","Kasih meme 1000x 🤣","Kasih jajan damai 🍩"]
+},
+{
+q:"5. Hubungan kita genre apa?",
+a:["Komedi romantis 🤣💕","Fantasy absurd 😈","Reality show chaos 🎬"]
+}
+];
+
+let current = 0;
+
+function chaosRain(){
+    const emojis=["💖","🤣","😈","💕","😆","🤪"];
+    setInterval(()=>{
+        let e=document.createElement("div");
+        e.className="fall";
+        e.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+        e.style.left=Math.random()*100+"vw";
+        e.style.animationDuration=(Math.random()*2+2)+"s";
+        document.body.appendChild(e);
+        setTimeout(()=>e.remove(),4000);
+    },200);
+}
+
+function showQuestion(){
+    const quiz=document.getElementById("quiz");
+    quiz.innerHTML="";
+    if(current<questions.length){
+        let q=document.createElement("h3");
+        q.textContent=questions[current].q;
+        quiz.appendChild(q);
+
+        questions[current].a.forEach(ans=>{
+            let btn=document.createElement("button");
+            btn.textContent=ans;
+            btn.className="answerBtn";
+            btn.onclick=()=>{
+                current++;
+                showQuestion();
+            };
+            quiz.appendChild(btn);
+        });
+    }else{
+        finalQuestion();
+    }
+}
+
+function finalQuestion(){
+    const quiz=document.getElementById("quiz");
+    quiz.innerHTML="<h3>PERTANYAAN TERAKHIR... KAMU SAYANG AKU NGGAK?! 😈</h3>";
+
+    let yes=document.createElement("button");
+    yes.id="yesBtn";
+    yes.textContent="Sayang banget 💕";
+
+    let yesScale=1;
+
+    // MEMBESAR BRUTAL TIAP HOVER
+    yes.addEventListener("mouseover",()=>{
+        yesScale+=0.4;
+        yes.style.transform="scale("+yesScale+") rotate(5deg)";
+    });
+
+    yes.addEventListener("click",()=>{
+        document.getElementById("quiz").innerHTML="";
+        document.getElementById("result").innerHTML=
+        "HAHA KETANGKAP 🤣💕<br><br>Kamu resmi BUClN LEVEL FINAL BOSS 😈💖";
+    });
+
+    let no=document.createElement("button");
+    no.id="noBtn";
+    no.textContent="Nggak sayang 😏";
+
+    let scale=1;
+
+    // MENGECIL + KABUR
+    no.addEventListener("mouseover",()=>{
+        scale-=0.1;
+        if(scale<0.2) scale=0.2;
+        no.style.transform="scale("+scale+")";
+
+        const maxX=window.innerWidth-150;
+        const maxY=window.innerHeight-80;
+        no.style.left=Math.random()*maxX+"px";
+        no.style.top=Math.random()*maxY+"px";
+    });
+
+    quiz.appendChild(yes);
+    quiz.appendChild(no);
+}
+
+showQuestion();
+chaosRain();
+</script>
+
+</body>
+</html>
