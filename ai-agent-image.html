@@ -1,0 +1,510 @@
+---
+layout: null
+permalink: /ai-agent-image
+---
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Project | Image Recognition & Recommendation System</title>
+  <style>
+    :root {
+      --bg: #050913;
+      --bg-soft: #0b1324;
+      --primary: #63f4ff;
+      --secondary: #7a8bff;
+      --accent: #6ff7c8;
+      --text: #edf4ff;
+      --text-muted: #9eb0cc;
+      --line: rgba(255, 255, 255, 0.14);
+      --card-shadow: 0 18px 40px rgba(5, 9, 19, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(99, 244, 255, 0.2), transparent 35%),
+        radial-gradient(circle at 80% 10%, rgba(122, 139, 255, 0.2), transparent 32%),
+        radial-gradient(circle at 70% 85%, rgba(111, 247, 200, 0.12), transparent 40%),
+        var(--bg);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    .orb-layer {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      filter: blur(80px);
+      animation: orbMove 18s ease-in-out infinite alternate;
+      background:
+        radial-gradient(circle at 25% 35%, rgba(99, 244, 255, 0.35), transparent 35%),
+        radial-gradient(circle at 70% 55%, rgba(122, 139, 255, 0.3), transparent 35%);
+    }
+
+    @keyframes orbMove {
+      from { transform: translate3d(-3%, 0, 0) scale(1); }
+      to { transform: translate3d(4%, -2%, 0) scale(1.08); }
+    }
+
+    .container {
+      width: min(1120px, 92vw);
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(180deg, rgba(5, 9, 19, 0.82), rgba(5, 9, 19, 0.35));
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      gap: 12px;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      font-size: 1.02rem;
+    }
+
+    .brand span {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .menu {
+      list-style: none;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .menu a {
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: all 0.28s ease;
+      font-size: 0.92rem;
+    }
+
+    .menu a:hover {
+      color: var(--text);
+      border-color: var(--line);
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-1px);
+    }
+
+    .hero {
+      padding: 84px 0 60px;
+      display: grid;
+      gap: 24px;
+      perspective: 1200px;
+    }
+
+    .badge {
+      width: fit-content;
+      border: 1px solid rgba(111, 247, 200, 0.38);
+      padding: 6px 12px;
+      border-radius: 999px;
+      color: #cdfbe9;
+      font-size: 0.83rem;
+      letter-spacing: 0.35px;
+      text-transform: uppercase;
+      background: rgba(111, 247, 200, 0.08);
+    }
+
+    .hero h1 {
+      max-width: 850px;
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+    }
+
+    .hero p {
+      max-width: 760px;
+      color: var(--text-muted);
+      font-size: clamp(1rem, 2.2vw, 1.12rem);
+    }
+
+    .cta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-top: 8px;
+    }
+
+    .btn {
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      font-weight: 600;
+      transition: all 0.28s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #051127;
+      box-shadow: var(--card-shadow);
+    }
+
+    .btn-secondary {
+      border-color: var(--line);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.04);
+    }
+
+    .glass-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(260px, 1fr));
+      gap: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: linear-gradient(140deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      box-shadow: var(--card-shadow);
+      transform-style: preserve-3d;
+      animation: hoverFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes hoverFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(7, 14, 29, 0.72);
+      transform: translateZ(26px);
+    }
+
+    .metric h3 {
+      font-size: 1.65rem;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .metric p {
+      color: var(--text-muted);
+      font-size: 0.94rem;
+    }
+
+    section {
+      padding: 36px 0;
+    }
+
+    .section-title {
+      margin-bottom: 16px;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+    }
+
+    .section-desc {
+      max-width: 760px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(250px, 1fr));
+      gap: 18px;
+      perspective: 1000px;
+    }
+
+    .project-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.03));
+      box-shadow: var(--card-shadow);
+      transform-style: preserve-3d;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      will-change: transform;
+    }
+
+    .project-card:hover {
+      box-shadow: 0 22px 44px rgba(8, 14, 28, 0.58);
+    }
+
+    .project-card h3 {
+      font-size: 1.22rem;
+      margin-bottom: 8px;
+      transform: translateZ(28px);
+    }
+
+    .project-card p {
+      color: var(--text-muted);
+      transform: translateZ(20px);
+    }
+
+    .pill-list {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 0.8rem;
+      color: #d2def2;
+      background: rgba(255, 255, 255, 0.03);
+      transform: translateZ(18px);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+    }
+
+    .timeline-item {
+      border-left: 2px solid rgba(99, 244, 255, 0.45);
+      padding: 12px 0 12px 14px;
+      color: var(--text-muted);
+      opacity: 0;
+      transform: translateY(8px);
+      animation: reveal 0.8s ease forwards;
+    }
+
+    .timeline-item:nth-child(2) { animation-delay: 0.12s; }
+    .timeline-item:nth-child(3) { animation-delay: 0.24s; }
+    .timeline-item:nth-child(4) { animation-delay: 0.36s; }
+
+    .timeline-item strong {
+      color: var(--text);
+      display: block;
+      margin-bottom: 3px;
+      letter-spacing: 0.2px;
+    }
+
+    @keyframes reveal {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .footer {
+      margin-top: 24px;
+      margin-bottom: 52px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer p {
+      color: var(--text-muted);
+      font-size: 0.94rem;
+    }
+
+    .footer .company {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    @media (max-width: 900px) {
+      .glass-grid,
+      .project-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding-top: 68px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb-layer"></div>
+
+  <header>
+    <div class="container nav">
+      <div class="brand">PT Teknologi <span>Artifisial Indonesia</span></div>
+      <ul class="menu">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#modules">Modules</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" id="overview">
+      <div class="badge">AI Product Showcase</div>
+      <h1>AI Project: Image Recognition dan Recommendation System</h1>
+      <p>
+        Halaman ini adalah demo konsep dari PT Teknologi Artifisial Indonesia.
+        Solusi menggabungkan computer vision dan engine rekomendasi untuk memberi
+        pengalaman personal, cepat, dan relevan untuk pengguna bisnis modern.
+      </p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#modules">Eksplor Modul</a>
+        <a class="btn btn-secondary" href="#roadmap">Lihat Roadmap</a>
+      </div>
+
+      <div class="glass-grid">
+        <article class="metric">
+          <h3>98.7%</h3>
+          <p>Akurasi pengenalan objek (dummy benchmark internal).</p>
+        </article>
+        <article class="metric">
+          <h3>34%</h3>
+          <p>Peningkatan konversi rekomendasi konten (dummy result).</p>
+        </article>
+        <article class="metric">
+          <h3>&lt; 200ms</h3>
+          <p>Rata-rata response inferensi untuk request API.</p>
+        </article>
+        <article class="metric">
+          <h3>1.2M</h3>
+          <p>Data gambar tersimulasi untuk riset model.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="modules">
+      <h2 class="section-title">Dua Pilar Solusi AI</h2>
+      <p class="section-desc">
+        Platform ini dibangun dari dua modul utama yang saling terintegrasi:
+        image recognition untuk memahami visual, dan recommendation system untuk
+        menentukan konten atau produk paling relevan.
+      </p>
+      <div class="project-grid">
+        <article class="project-card js-tilt-card">
+          <h3>Image Recognition Engine</h3>
+          <p>
+            Mendeteksi objek, kategori visual, dan konteks gambar secara real-time
+            menggunakan pipeline preprocessing, feature extraction, dan model klasifikasi.
+          </p>
+          <div class="pill-list">
+            <span class="pill">Object Detection</span>
+            <span class="pill">Visual Tagging</span>
+            <span class="pill">Quality Scoring</span>
+          </div>
+        </article>
+        <article class="project-card js-tilt-card">
+          <h3>Recommendation Intelligence</h3>
+          <p>
+            Memberikan saran produk atau konten berdasarkan perilaku pengguna,
+            kemiripan visual, dan ranking model berbasis intent serta preference.
+          </p>
+          <div class="pill-list">
+            <span class="pill">Hybrid Ranking</span>
+            <span class="pill">User Personalization</span>
+            <span class="pill">Realtime Feedback</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="roadmap">
+      <h2 class="section-title">Roadmap Implementasi (Dummy)</h2>
+      <p class="section-desc">
+        Simulasi tahapan pengembangan dari fase riset hingga optimasi produksi.
+      </p>
+      <div class="timeline">
+        <article class="timeline-item">
+          <strong>Phase 1 - Data Foundation</strong>
+          Konsolidasi data gambar, labeling semi otomatis, dan baseline model setup.
+        </article>
+        <article class="timeline-item">
+          <strong>Phase 2 - Model Development</strong>
+          Training model image recognition dan validasi quality dengan metrik evaluasi.
+        </article>
+        <article class="timeline-item">
+          <strong>Phase 3 - Recommendation Integration</strong>
+          Integrasi feature visual ke engine rekomendasi untuk hasil lebih personal.
+        </article>
+        <article class="timeline-item">
+          <strong>Phase 4 - Monitoring and Scaling</strong>
+          Penerapan observability, A/B testing, dan optimasi performa produksi.
+        </article>
+      </div>
+    </section>
+
+    <section class="footer">
+      <div>
+        <div class="company">PT Teknologi Artifisial Indonesia</div>
+        <p>Demo halaman AI Project untuk kebutuhan presentasi internal dan showcase.</p>
+      </div>
+      <a class="btn btn-primary" href="#overview">Kembali ke Atas</a>
+    </section>
+  </main>
+
+  <script>
+    // Smooth interactive 3D tilt for module cards.
+    const cards = document.querySelectorAll(".js-tilt-card");
+
+    cards.forEach((card) => {
+      const maxTilt = 10;
+      const reset = () => {
+        card.style.transform = "rotateX(0deg) rotateY(0deg) translateY(0)";
+      };
+
+      card.addEventListener("mousemove", (event) => {
+        const rect = card.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateY = ((x - centerX) / centerX) * maxTilt;
+        const rotateX = -((y - centerY) / centerY) * maxTilt;
+
+        card.style.transform =
+          "rotateX(" + rotateX + "deg) rotateY(" + rotateY + "deg) translateY(-4px)";
+      });
+
+      card.addEventListener("mouseleave", reset);
+      card.addEventListener("blur", reset);
+    });
+  </script>
+</body>
+</html>
