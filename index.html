@@ -1,197 +1,529 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TOTP List - Dark UI</title>
-<style>
-  body {
-    background-color: #121212;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-  header {
-    padding: 1rem;
-    text-align: center;
-    background: #1f1f1f;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  header input {
-    padding: 0.5rem;
-    border-radius: 5px;
-    border: none;
-    width: 250px;
-    background: #2a2a2a;
-    color: white;
-  }
-  .container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
-    padding: 1rem;
-  }
-  .card {
-    background: #1e1e1e;
-    border-radius: 12px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-  }
-  .otp {
-    font-size: 2rem;
-    font-weight: bold;
-    letter-spacing: 2px;
-  }
-  .meta {
-    font-size: 0.9rem;
-    color: #bbb;
-  }
-  .issuer {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #fff;
-  }
-  .account {
-    font-size: 0.9rem;
-    color: #888;
-  }
-  .progress {
-    height: 5px;
-    background: #333;
-    border-radius: 3px;
-    overflow: hidden;
-  }
-  .progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #4cafef, #2196f3);
-    transition: width 1s linear;
-  }
-  .copy-btn {
-    margin-top: 0.5rem;
-    padding: 0.4rem 0.6rem;
-    background: #2196f3;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .copy-btn:hover {
-    background: #1976d2;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PT Manufaktur Indonesia | Agency Profile</title>
+  <style>
+    :root {
+      --bg: #060b17;
+      --bg-soft: #0f1930;
+      --card: rgba(255, 255, 255, 0.08);
+      --line: rgba(255, 255, 255, 0.22);
+      --text: #f4f7ff;
+      --text-soft: #a9b4d0;
+      --primary: #5de0ff;
+      --secondary: #8c72ff;
+      --accent: #5bffcc;
+      --shadow: 0 30px 60px rgba(6, 11, 23, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(93, 224, 255, 0.18), transparent 40%),
+        radial-gradient(circle at 80% 15%, rgba(140, 114, 255, 0.22), transparent 35%),
+        radial-gradient(circle at 75% 80%, rgba(91, 255, 204, 0.12), transparent 40%),
+        var(--bg);
+      overflow-x: hidden;
+    }
+
+    .back-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      filter: blur(80px);
+      z-index: -1;
+      animation: drift 16s ease-in-out infinite alternate;
+      background:
+        radial-gradient(circle at 30% 40%, rgba(93, 224, 255, 0.35), transparent 33%),
+        radial-gradient(circle at 70% 60%, rgba(140, 114, 255, 0.3), transparent 36%);
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translate3d(-3%, 0, 0) scale(1);
+      }
+      100% {
+        transform: translate3d(3%, -2%, 0) scale(1.08);
+      }
+    }
+
+    .container {
+      width: min(1120px, 92vw);
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(6, 11, 23, 0.78), rgba(6, 11, 23, 0.32));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      gap: 20px;
+    }
+
+    .brand {
+      font-size: 1.02rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: #ffffff;
+    }
+
+    .brand span {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .menu {
+      display: flex;
+      gap: 14px;
+      list-style: none;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: var(--text-soft);
+      padding: 8px 12px;
+      border-radius: 999px;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .menu a:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .hero {
+      padding: 72px 0 30px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 36px;
+      align-items: center;
+      perspective: 1000px;
+    }
+
+    .hero-copy h1 {
+      font-size: clamp(2rem, 4vw, 3.3rem);
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+
+    .hero-copy p {
+      color: var(--text-soft);
+      line-height: 1.75;
+      max-width: 58ch;
+      margin-bottom: 24px;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      border: 1px solid var(--line);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .btn-primary {
+      color: #061020;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      box-shadow: 0 14px 32px rgba(93, 224, 255, 0.24);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 28px rgba(0, 0, 0, 0.24);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .hero-visual {
+      position: relative;
+      transform-style: preserve-3d;
+      animation: float 7s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(-3deg);
+      }
+      50% {
+        transform: translate3d(0, -10px, 0) rotateX(2deg) rotateY(3deg);
+      }
+    }
+
+    .glass-card {
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      padding: 20px;
+      background: linear-gradient(165deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.04));
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat {
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(12, 23, 45, 0.48);
+      transform: translateZ(24px);
+    }
+
+    .stat h3 {
+      font-size: 1.3rem;
+      margin-bottom: 4px;
+      color: #ffffff;
+    }
+
+    .stat p {
+      font-size: 0.87rem;
+      color: var(--text-soft);
+    }
+
+    .section {
+      padding: 58px 0;
+    }
+
+    .section-title {
+      margin-bottom: 18px;
+      font-size: clamp(1.5rem, 2vw, 2rem);
+    }
+
+    .section-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 28px;
+      max-width: 68ch;
+      line-height: 1.72;
+    }
+
+    .about-card {
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+      box-shadow: var(--shadow);
+      transform: translateY(0);
+      transition: transform 0.35s ease;
+    }
+
+    .about-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .about-points {
+      margin-top: 14px;
+      padding-left: 18px;
+      color: #d4ddf4;
+      line-height: 1.8;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      perspective: 1000px;
+    }
+
+    .service-card {
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.03));
+      backdrop-filter: blur(10px);
+      padding: 18px;
+      min-height: 196px;
+      box-shadow: var(--shadow);
+      transform-style: preserve-3d;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .service-card h3 {
+      margin-bottom: 8px;
+      font-size: 1.08rem;
+    }
+
+    .service-card p {
+      color: var(--text-soft);
+      line-height: 1.68;
+      font-size: 0.95rem;
+    }
+
+    .service-card:hover {
+      border-color: rgba(93, 224, 255, 0.8);
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .contact-item {
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .contact-item .label {
+      color: var(--text-soft);
+      font-size: 0.83rem;
+      margin-bottom: 4px;
+    }
+
+    .contact-item .value {
+      font-weight: 600;
+    }
+
+    footer {
+      text-align: center;
+      color: #98a6ca;
+      padding: 30px 0 48px;
+      font-size: 0.9rem;
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: reveal 0.7s ease forwards;
+      animation-delay: var(--delay, 0s);
+    }
+
+    @keyframes reveal {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="back-glow"></div>
 
-<header>
-  <input type="text" id="search" placeholder="Search issuer/account...">
-</header>
+  <header>
+    <div class="container nav">
+      <div class="brand">Agency <span>PT Manufaktur Indonesia</span></div>
+      <ul class="menu">
+        <li><a href="#about">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </header>
 
-<div class="container" id="totpList"></div>
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy fade-in" style="--delay: 0.05s;">
+          <h1>Transformasi Digital Industri dengan Sentuhan 3D Experience</h1>
+          <p>
+            Agency PT Manufaktur Indonesia membantu brand manufaktur membangun strategi pemasaran,
+            identitas digital, dan kampanye kreatif berbasis data. Kami menggabungkan cerita brand,
+            teknologi, serta desain modern untuk mendorong pertumbuhan bisnis.
+          </p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#contact">Konsultasi Gratis</a>
+            <a class="btn btn-secondary" href="#services">Lihat Layanan</a>
+          </div>
+        </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/3.2.0/sha.js"></script>
-<script>
-  // ====== PASSWORD PROTECTION ======
-  const correctPassword = "150123"; // ubah sesuai kebutuhan
-  let pass = prompt("Masukkan password:");
-  if (pass !== correctPassword) {
-    document.body.innerHTML = "<h1 style='color:white;text-align:center;margin-top:50px;'>Password salah!</h1>";
-    throw new Error("Password salah");
-  }
+        <div class="hero-visual fade-in" style="--delay: 0.2s;">
+          <div class="glass-card">
+            <h2>Dummy Performance 2026</h2>
+            <p class="section-subtitle" style="margin: 8px 0 0;">
+              Snapshot progres kampanye klien manufaktur dalam 1 kuartal terakhir.
+            </p>
+            <div class="stat-grid">
+              <div class="stat">
+                <h3>+68%</h3>
+                <p>Growth traffic website</p>
+              </div>
+              <div class="stat">
+                <h3>41</h3>
+                <p>Project agency aktif</p>
+              </div>
+              <div class="stat">
+                <h3>92%</h3>
+                <p>Client retention rate</p>
+              </div>
+              <div class="stat">
+                <h3>15M</h3>
+                <p>Impresi kampanye digital</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  // ====== STATIC SECRET LIST ======
-const secrets = [
-      { secret: "RDKE6NFSB37FAS74FBTDPNF4U42XWE6D", issuer: "AWS Secret", account: "techfe-kristian" },
-      { secret: "odgluctjssjfleh46pp3xio7xzrnijmp", issuer: "Google", account: "kristian.wijaya@ruparupa.com" },
-      { secret: "WO55TYAVBCTCXOEEUQC3JTNQGISB6UJK", issuer: "Gideon Production", account: "kristian@ruparupa.com" },
-      { secret: "TP3FOJWMTWH67GK4AYTAP7JLHFCTMRX2", issuer: "OMS Production", account: "kristian2@ruparupa.com" },
-      { secret: "6YQGJWWV3HFCKNWQBSEHHJOPOVKARNLK", issuer: "Postmark", account: "kristian.wijaya@ruparupa.com" },
-      { secret: "USA7GDAAHIVOVHOI6R7BHC6T2CNFW6O6", issuer: "ruparupa-production", account: "kristian@new-teleport.rupasecops.com" },
-      { secret: "NNHGU3KSMNLGSRRXM47SWSK5GRGHOXD2", issuer: "Atlassian", account: "kristian.wijaya@ruparupa.com" },
-      { secret: "NO2XLVSJRXHI65NRVBPCBHRU3KW5FJQS", issuer: "Cloudinary", account: "kristian.wijaya@ruparupa.com" },
-      { secret: "aok7hpa4cmjilpx54q5eblxa752ziy7l", issuer: "Google", account: "tech.ruparupa@gmail.com" },
-      { secret: "2VRB3BAYAQTSWKPF7QMAP3GRE4FEXK5V", issuer: "ruparupa-production", account: "kristian@teleport.rupasecops.com" },
-      { secret: "CXYV5YELRVBXVZTH3RG66MSYYQ5NUVH7", issuer: "OpenAI", account: "admin@ruparupa.com" },
-      { secret: "IN3GWMKLGBWDA4JB", issuer: "Tokocrypto", account: "kristian.handoko@yahoo.co.id" },
-      { secret: "7CKLI255TE7UNHB4BE3FSYLMULVCLOTD", issuer: "hub.docker.com", account: "testkpower" },
-    ];
-    
-  const period = 30;
+    <section class="section" id="about">
+      <div class="container fade-in" style="--delay: 0.1s;">
+        <h2 class="section-title">About</h2>
+        <p class="section-subtitle">
+          PT Manufaktur Indonesia adalah agency kreatif yang berfokus pada sektor industri dan manufaktur.
+          Kami hadir sebagai partner strategis untuk membantu perusahaan tampil lebih kuat di era digital.
+        </p>
+        <article class="about-card">
+          <p>
+            Tim kami terdiri dari konsultan brand, desainer UI/UX, spesialis iklan digital,
+            dan analis data. Dengan pendekatan kolaboratif, kami memastikan setiap kampanye
+            memiliki arah bisnis yang jelas dan dampak nyata.
+          </p>
+          <ul class="about-points">
+            <li>Didirikan: 2018 (dummy data)</li>
+            <li>Lokasi: Jakarta, Indonesia (dummy data)</li>
+            <li>Fokus: Branding, Digital Campaign, Website Experience</li>
+          </ul>
+        </article>
+      </div>
+    </section>
 
-  function base32toHex(base32) {
-    const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    let bits = "";
-    let hex = "";
-    base32 = base32.replace(/=+$/, "");
-    for (let i = 0; i < base32.length; i++) {
-      let val = base32chars.indexOf(base32.charAt(i).toUpperCase());
-      bits += val.toString(2).padStart(5, "0");
-    }
-    for (let i = 0; i + 4 <= bits.length; i += 4) {
-      let chunk = bits.substr(i, 4);
-      hex += parseInt(chunk, 2).toString(16);
-    }
-    return hex;
-  }
+    <section class="section" id="services">
+      <div class="container">
+        <h2 class="section-title fade-in" style="--delay: 0.05s;">Services</h2>
+        <p class="section-subtitle fade-in" style="--delay: 0.1s;">
+          Layanan inti agency kami dirancang untuk meningkatkan visibilitas brand dan mempercepat
+          proses akuisisi pelanggan pada bisnis manufaktur.
+        </p>
+        <div class="services-grid">
+          <article class="service-card fade-in tilt-card" style="--delay: 0.14s;">
+            <h3>Brand Strategy</h3>
+            <p>
+              Menyusun posisi brand, value proposition, dan komunikasi yang relevan untuk pasar B2B maupun B2C.
+            </p>
+          </article>
+          <article class="service-card fade-in tilt-card" style="--delay: 0.2s;">
+            <h3>Website & 3D Visual Experience</h3>
+            <p>
+              Mendesain website perusahaan dengan tampilan interaktif, animasi halus, dan user journey terstruktur.
+            </p>
+          </article>
+          <article class="service-card fade-in tilt-card" style="--delay: 0.26s;">
+            <h3>Digital Campaign Management</h3>
+            <p>
+              Mengelola campaign lintas platform untuk meningkatkan lead berkualitas dan konversi penjualan.
+            </p>
+          </article>
+          <article class="service-card fade-in tilt-card" style="--delay: 0.32s;">
+            <h3>Data & Reporting</h3>
+            <p>
+              Menyediakan dashboard performa, insight bulanan, dan rekomendasi optimasi berbasis data.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-  function generateTOTP(secret) {
-    const epoch = Math.floor(Date.now() / 1000);
-    const time = Math.floor(epoch / period);
-    const timeHex = time.toString(16).padStart(16, "0");
-    const key = base32toHex(secret);
-    const shaObj = new jsSHA("SHA-1", "HEX");
-    shaObj.setHMACKey(key, "HEX");
-    shaObj.update(timeHex);
-    const hmac = shaObj.getHMAC("HEX");
-    const offset = parseInt(hmac.substring(hmac.length - 1), 16);
-    const otp = (parseInt(hmac.substr(offset * 2, 8), 16) & 0x7fffffff) + "";
-    return otp.substr(otp.length - 6);
-  }
+    <section class="section" id="contact">
+      <div class="container fade-in" style="--delay: 0.08s;">
+        <h2 class="section-title">Contact</h2>
+        <p class="section-subtitle">
+          Hubungi tim Agency PT Manufaktur Indonesia untuk diskusi kebutuhan branding dan transformasi digital.
+        </p>
+        <div class="contact-grid">
+          <div class="contact-item">
+            <div class="label">Email</div>
+            <div class="value">hello@ptmanufakturagency.co.id</div>
+          </div>
+          <div class="contact-item">
+            <div class="label">Telepon</div>
+            <div class="value">+62 21 5558 9000</div>
+          </div>
+          <div class="contact-item">
+            <div class="label">Alamat</div>
+            <div class="value">Jl. Gatot Subroto No. 88, Jakarta Selatan</div>
+          </div>
+          <div class="contact-item">
+            <div class="label">Jam Operasional</div>
+            <div class="value">Senin - Jumat, 09:00 - 18:00 WIB</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-  function renderList() {
-    const listContainer = document.getElementById("totpList");
-    const searchVal = document.getElementById("search").value.toLowerCase();
-    listContainer.innerHTML = "";
-    secrets.forEach(item => {
-      if (
-        item.issuer.toLowerCase().includes(searchVal) ||
-        item.account.toLowerCase().includes(searchVal)
-      ) {
-        const otp = generateTOTP(item.secret);
-        const remain = period - (Math.floor(Date.now() / 1000) % period);
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <div class="issuer">${item.issuer}</div>
-          <div class="account">${item.account}</div>
-          <div class="otp">${otp}</div>
-          <div class="progress"><div class="progress-bar" style="width:${(1 - remain / period) * 100}%"></div></div>
-          <button class="copy-btn">Copy</button>
-        `;
-        card.querySelector(".copy-btn").onclick = () => {
-          navigator.clipboard.writeText(otp);
-          card.style.boxShadow = "0 0 10px #4cafef";
-          setTimeout(() => card.style.boxShadow = "", 500);
-        };
-        listContainer.appendChild(card);
-      }
+  <footer>
+    &copy; 2026 Agency PT Manufaktur Indonesia. All Rights Reserved.
+  </footer>
+
+  <script>
+    // Subtle 3D tilt for service cards with pointer movement.
+    const cards = document.querySelectorAll(".tilt-card");
+
+    cards.forEach((card) => {
+      card.addEventListener("mousemove", (event) => {
+        const rect = card.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const rotateX = -((y / rect.height) - 0.5) * 10;
+        const rotateY = ((x / rect.width) - 0.5) * 12;
+        card.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-4px)`;
+      });
+
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "rotateX(0deg) rotateY(0deg) translateY(0)";
+      });
     });
-  }
-
-  setInterval(renderList, 1000);
-  document.getElementById("search").addEventListener("input", renderList);
-  renderList();
-</script>
-
+  </script>
 </body>
 </html>
