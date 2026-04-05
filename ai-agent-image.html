@@ -1,0 +1,479 @@
+---
+layout: null
+permalink: /ai-agent-image/
+---
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Project | Image Recognition & Recommendation System</title>
+  <style>
+    :root {
+      --bg-1: #050914;
+      --bg-2: #0b1733;
+      --bg-3: #111f44;
+      --txt-main: #f5f9ff;
+      --txt-soft: #aeb8d4;
+      --line: rgba(255, 255, 255, 0.2);
+      --cyan: #53eaff;
+      --violet: #8d74ff;
+      --mint: #6bffcf;
+      --shadow: 0 24px 50px rgba(3, 10, 24, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      color: var(--txt-main);
+      background:
+        radial-gradient(circle at 20% 18%, rgba(83, 234, 255, 0.16), transparent 35%),
+        radial-gradient(circle at 82% 10%, rgba(141, 116, 255, 0.18), transparent 32%),
+        radial-gradient(circle at 75% 80%, rgba(107, 255, 207, 0.12), transparent 34%),
+        linear-gradient(160deg, var(--bg-1), var(--bg-2) 55%, var(--bg-3));
+      overflow-x: hidden;
+    }
+
+    .ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      filter: blur(70px);
+      background:
+        radial-gradient(circle at 28% 44%, rgba(83, 234, 255, 0.28), transparent 38%),
+        radial-gradient(circle at 70% 52%, rgba(141, 116, 255, 0.25), transparent 40%);
+      animation: ambientMove 14s ease-in-out infinite alternate;
+    }
+
+    @keyframes ambientMove {
+      0% {
+        transform: translate3d(-2%, 0, 0) scale(1);
+      }
+      100% {
+        transform: translate3d(2%, -2%, 0) scale(1.06);
+      }
+    }
+
+    .container {
+      width: min(1120px, 92vw);
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(12px);
+      background: linear-gradient(180deg, rgba(5, 9, 20, 0.82), rgba(5, 9, 20, 0.3));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav {
+      padding: 16px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+
+    .brand span {
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: var(--txt-soft);
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: all 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--txt-main);
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .hero {
+      padding: 72px 0 40px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 28px;
+      align-items: center;
+      perspective: 1100px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.12;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      color: var(--txt-soft);
+      line-height: 1.75;
+      max-width: 62ch;
+      margin-bottom: 22px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      color: #dfe8ff;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      border: 1px solid var(--line);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      margin-right: 10px;
+      margin-bottom: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--cyan), var(--mint));
+      color: #071422;
+      border: none;
+      box-shadow: 0 12px 28px rgba(83, 234, 255, 0.25);
+    }
+
+    .btn-secondary {
+      color: var(--txt-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25);
+    }
+
+    .visual-3d {
+      transform-style: preserve-3d;
+      animation: floatCard 7s ease-in-out infinite;
+    }
+
+    @keyframes floatCard {
+      0%, 100% {
+        transform: rotateX(0deg) rotateY(-3deg) translate3d(0, 0, 0);
+      }
+      50% {
+        transform: rotateX(3deg) rotateY(4deg) translate3d(0, -8px, 0);
+      }
+    }
+
+    .glass {
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: linear-gradient(165deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.03));
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .mini-grid {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mini-card {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(12, 24, 48, 0.5);
+      transform: translateZ(25px);
+    }
+
+    .mini-card h3 {
+      font-size: 1.15rem;
+      margin-bottom: 4px;
+    }
+
+    .mini-card p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--txt-soft);
+      line-height: 1.5;
+    }
+
+    .section {
+      padding: 56px 0;
+    }
+
+    .section h2 {
+      font-size: clamp(1.4rem, 2vw, 1.95rem);
+      margin-bottom: 14px;
+    }
+
+    .section-intro {
+      color: var(--txt-soft);
+      line-height: 1.7;
+      margin-bottom: 22px;
+      max-width: 72ch;
+    }
+
+    .desc-card {
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 18px;
+      padding: 22px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+      box-shadow: var(--shadow);
+    }
+
+    .desc-list {
+      margin-top: 12px;
+      padding-left: 18px;
+      color: #d9e2fd;
+      line-height: 1.8;
+    }
+
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+      perspective: 1000px;
+    }
+
+    .stack-item {
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.03));
+      backdrop-filter: blur(10px);
+      min-height: 120px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      transform-style: preserve-3d;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .stack-item h3 {
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .stack-item p {
+      color: var(--txt-soft);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .stack-item:hover {
+      border-color: rgba(83, 234, 255, 0.7);
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 0.75s ease forwards;
+      animation-delay: var(--delay, 0s);
+    }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    footer {
+      text-align: center;
+      color: #9badcf;
+      padding: 24px 0 40px;
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient"></div>
+
+  <header>
+    <div class="container nav">
+      <div class="brand">PT <span>Teknologi Artifisial Indonesia</span></div>
+      <ul class="nav-links">
+        <li><a href="#deskripsi">Deskripsi</a></li>
+        <li><a href="#tech-stack">Tech stack</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="fade-up" style="--delay: 0.04s;">
+          <div class="hero-badge">AI Project • Dummy Showcase</div>
+          <h1>Image Recognition & Recommendation System</h1>
+          <p>
+            Proyek AI dari PT Teknologi Artifisial Indonesia ini menggabungkan kemampuan computer vision
+            untuk mengenali objek pada gambar dan memberikan rekomendasi produk/aksi paling relevan
+            secara real-time. Konten pada halaman ini merupakan dummy untuk kebutuhan presentasi konsep.
+          </p>
+          <a class="btn btn-primary" href="#deskripsi">Lihat Deskripsi</a>
+          <a class="btn btn-secondary" href="#tech-stack">Lihat Tech stack</a>
+        </div>
+
+        <div class="visual-3d fade-up" style="--delay: 0.2s;">
+          <div class="glass">
+            <h2>Dummy KPI Snapshot</h2>
+            <p class="section-intro" style="margin: 8px 0 0;">
+              Simulasi performa model AI untuk kebutuhan proof-of-concept internal.
+            </p>
+            <div class="mini-grid">
+              <div class="mini-card">
+                <h3>95.2%</h3>
+                <p>Image classification accuracy</p>
+              </div>
+              <div class="mini-card">
+                <h3>36 ms</h3>
+                <p>Average inference latency</p>
+              </div>
+              <div class="mini-card">
+                <h3>+41%</h3>
+                <p>Recommendation click-through</p>
+              </div>
+              <div class="mini-card">
+                <h3>120K</h3>
+                <p>Dummy processed images/month</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="deskripsi">
+      <div class="container fade-up" style="--delay: 0.08s;">
+        <h2>Deskripsi</h2>
+        <p class="section-intro">
+          Sistem ini dirancang untuk dua alur utama: (1) mengenali konten visual dari input gambar,
+          dan (2) menghasilkan rekomendasi cerdas berdasarkan hasil pengenalan, perilaku user, serta
+          konteks kategori data. Seluruh detail berikut merupakan data dummy dari PT Teknologi Artifisial Indonesia.
+        </p>
+        <article class="desc-card">
+          <p>
+            Platform AI ini dapat digunakan untuk e-commerce, retail analytics, dan aplikasi operasional
+            yang membutuhkan pengambilan keputusan cepat berbasis visual. Arsitektur dirancang modular
+            agar mudah dikembangkan ke multi-model pipeline.
+          </p>
+          <ul class="desc-list">
+            <li>Use case dummy: visual product tagging dan smart recommendation.</li>
+            <li>Mode implementasi: cloud API + dashboard monitoring internal.</li>
+            <li>Fitur tambahan: feedback loop untuk model retraining berkala.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="tech-stack">
+      <div class="container">
+        <h2 class="fade-up" style="--delay: 0.05s;">Tech stack</h2>
+        <p class="section-intro fade-up" style="--delay: 0.1s;">
+          Berikut contoh komponen teknologi (dummy) yang digunakan untuk membangun AI Project:
+          Image Recognition dan Recommendation System.
+        </p>
+        <div class="stack-grid">
+          <article class="stack-item fade-up tilt-item" style="--delay: 0.14s;">
+            <h3>Python + FastAPI</h3>
+            <p>Backend API inferensi model dan orkestrasi layanan.</p>
+          </article>
+          <article class="stack-item fade-up tilt-item" style="--delay: 0.2s;">
+            <h3>PyTorch</h3>
+            <p>Training model computer vision untuk klasifikasi dan embedding.</p>
+          </article>
+          <article class="stack-item fade-up tilt-item" style="--delay: 0.26s;">
+            <h3>TensorRT</h3>
+            <p>Optimasi model deployment untuk latency rendah di production.</p>
+          </article>
+          <article class="stack-item fade-up tilt-item" style="--delay: 0.32s;">
+            <h3>PostgreSQL</h3>
+            <p>Penyimpanan metadata user, item, dan histori interaksi rekomendasi.</p>
+          </article>
+          <article class="stack-item fade-up tilt-item" style="--delay: 0.38s;">
+            <h3>Redis</h3>
+            <p>Caching hasil rekomendasi populer dan session-level scoring.</p>
+          </article>
+          <article class="stack-item fade-up tilt-item" style="--delay: 0.44s;">
+            <h3>Docker + Kubernetes</h3>
+            <p>Containerization dan auto-scaling layanan AI di lingkungan cloud.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2026 PT Teknologi Artifisial Indonesia — AI Project Dummy Page
+  </footer>
+
+  <script>
+    // Smooth 3D tilt effect on tech stack cards.
+    const stackItems = document.querySelectorAll(".tilt-item");
+
+    stackItems.forEach((item) => {
+      item.addEventListener("mousemove", (event) => {
+        const rect = item.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const rotateX = -((y / rect.height) - 0.5) * 10;
+        const rotateY = ((x / rect.width) - 0.5) * 12;
+        item.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-3px)`;
+      });
+
+      item.addEventListener("mouseleave", () => {
+        item.style.transform = "rotateX(0deg) rotateY(0deg) translateY(0)";
+      });
+    });
+  </script>
+</body>
+</html>
