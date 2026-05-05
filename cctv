@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCTV Kristian</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white">
+
+  <div class="p-6 max-w-7xl mx-auto">
+    <h1 class="text-3xl font-bold mb-4 text-center">CCTV Bali Tower Jakarta</h1>
+
+    <!-- Search -->
+    <div class="mb-6">
+      <input id="searchInput" type="text" placeholder="Cari lokasi (contoh: monas, tomang...)"
+        class="w-full p-3 rounded-xl bg-gray-800 border border-gray-700 focus:outline-none">
+    </div>
+
+    <!-- Grid -->
+    <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </div>
+
+<script>
+const cameras = [
+  // Bendungan Hilir
+  { name: "Bendungan Hilir Cam 1", url: "https://cctv.balitower.co.id/Bendungan-Hilir-003-700014_1/embed.html" },
+  { name: "Bendungan Hilir Cam 2", url: "https://cctv.balitower.co.id/Bendungan-Hilir-003-700014_2/embed.html" },
+  { name: "Bendungan Hilir Cam 3", url: "https://cctv.balitower.co.id/Bendungan-Hilir-003-700014_3/embed.html" },
+  { name: "Bendungan Hilir Cam 4", url: "https://cctv.balitower.co.id/Bendungan-Hilir-003-700014_4/embed.html" },
+
+  // GBK / Gelora
+  { name: "GBK Cam 1", url: "https://cctv.balitower.co.id/Gelora-017-700470_1/embed.html" },
+  { name: "GBK Cam 2", url: "https://cctv.balitower.co.id/Gelora-017-700470_2/embed.html" },
+  { name: "GBK Cam 3", url: "https://cctv.balitower.co.id/Gelora-017-700470_3/embed.html" },
+  { name: "GBK Cam 4", url: "https://cctv.balitower.co.id/Gelora-017-700470_4/embed.html" },
+  { name: "GBK Cam 5", url: "https://cctv.balitower.co.id/Gelora-017-700470_5/embed.html" },
+  { name: "GBK Cam 6", url: "https://cctv.balitower.co.id/Gelora-017-700470_6/embed.html" },
+  { name: "GBK Cam 7", url: "https://cctv.balitower.co.id/Gelora-017-700470_7/embed.html" },
+  { name: "GBK Cam 8", url: "https://cctv.balitower.co.id/Gelora-017-700470_8/embed.html" },
+  { name: "GBK Cam 9", url: "https://cctv.balitower.co.id/Gelora-017-700470_9/embed.html" },
+  { name: "GBK Cam 10", url: "https://cctv.balitower.co.id/Gelora-017-700470_10/embed.html" },
+
+  // Monas / Merdeka
+  { name: "Pospol Merdeka Utara", url: "https://cctv.balitower.co.id/Pospol-Merdeka-Utara-506818_1/embed.html" },
+  { name: "Pospol Merdeka Barat", url: "https://cctv.balitower.co.id/Pospol-Merdeka-Barat-506817_1/embed.html" },
+
+  { name: "Monas Barat 010 Cam 1", url: "https://cctv.balitower.co.id/Monas-Barat-010-506633_1/embed.html" },
+  { name: "Monas Barat 010 Cam 2", url: "https://cctv.balitower.co.id/Monas-Barat-010-506633_2/embed.html" },
+  { name: "Monas Barat 010 Cam 3", url: "https://cctv.balitower.co.id/Monas-Barat-010-506633_3/embed.html" },
+
+  { name: "Monas Barat 009 Cam 1", url: "https://cctv.balitower.co.id/Monas-Barat-009-506632_1/embed.html" },
+  { name: "Monas Barat 009 Cam 2", url: "https://cctv.balitower.co.id/Monas-Barat-009-506632_2/embed.html" },
+  { name: "Monas Barat 009 Cam 3", url: "https://cctv.balitower.co.id/Monas-Barat-009-506632_3/embed.html" },
+
+  { name: "Monas Barat 008 Cam 1", url: "https://cctv.balitower.co.id/Monas-Barat-008-506631_1/embed.html" },
+  { name: "Monas Barat 008 Cam 2", url: "https://cctv.balitower.co.id/Monas-Barat-008-506631_2/embed.html" },
+  { name: "Monas Barat 008 Cam 3", url: "https://cctv.balitower.co.id/Monas-Barat-008-506631_3/embed.html" },
+
+  { name: "Monas Utara A", url: "https://cctv.balitower.co.id/Monas-Utara-001_a/embed.html" },
+  { name: "Monas Utara B", url: "https://cctv.balitower.co.id/Monas-Utara-001_b/embed.html" },
+  { name: "Monas Utara C", url: "https://cctv.balitower.co.id/Monas-Utara-001_c/embed.html" },
+
+  // Tomang
+  { name: "Tomang Cam 1", url: "https://cctv.balitower.co.id/Tomang-004-702108_1/embed.html" },
+  { name: "Tomang Cam 2", url: "https://cctv.balitower.co.id/Tomang-004-702108_2/embed.html" },
+  { name: "Tomang Cam 3", url: "https://cctv.balitower.co.id/Tomang-004-702108_3/embed.html" },
+  { name: "Tomang Cam 4", url: "https://cctv.balitower.co.id/Tomang-004-702108_4/embed.html" },
+
+  // Jati Pulo
+  { name: "Jati Pulo Cam 1", url: "https://cctv.balitower.co.id/Jati-Pulo-001-702017_1/embed.html" },
+  { name: "Jati Pulo Cam 2", url: "https://cctv.balitower.co.id/Jati-Pulo-001-702017_2/embed.html" },
+  { name: "Jati Pulo Cam 3", url: "https://cctv.balitower.co.id/Jati-Pulo-001-702017_3/embed.html" },
+  { name: "Jati Pulo Cam 4", url: "https://cctv.balitower.co.id/Jati-Pulo-001-702017_4/embed.html" },
+
+  // Tanjung Duren
+  { name: "Tanjung Duren Cam 1", url: "https://cctv.balitower.co.id/Tanjung-Duren-Utara-005-702471_1/embed.html" },
+  { name: "Tanjung Duren Cam 2", url: "https://cctv.balitower.co.id/Tanjung-Duren-Utara-005-702471_2/embed.html" },
+  { name: "Tanjung Duren Cam 3", url: "https://cctv.balitower.co.id/Tanjung-Duren-Utara-005-702471_3/embed.html" },
+  { name: "Tanjung Duren Cam 4", url: "https://cctv.balitower.co.id/Tanjung-Duren-Utara-005-702471_4/embed.html" },
+
+  // Senayan
+  { name: "Senayan Cam 1", url: "https://cctv.balitower.co.id/Senayan-004-705087_1/embed.html" },
+  { name: "Senayan Cam 2", url: "https://cctv.balitower.co.id/Senayan-004-705087_2/embed.html" },
+  { name: "Senayan Cam 3", url: "https://cctv.balitower.co.id/Senayan-004-705087_3/embed.html" },
+  { name: "Senayan Cam 4", url: "https://cctv.balitower.co.id/Senayan-004-705087_4/embed.html" },
+
+  // Kemanggisan
+  { name: "Kemanggisan Cam 1", url: "https://cctv.balitower.co.id/Kemanggisan-038-792405_1/embed.html" },
+  { name: "Kemanggisan Cam 2", url: "https://cctv.balitower.co.id/Kemanggisan-038-792405_2/embed.html" },
+  { name: "Kemanggisan Cam 3", url: "https://cctv.balitower.co.id/Kemanggisan-038-792405_3/embed.html" }
+];
+
+const grid = document.getElementById("grid");
+const searchInput = document.getElementById("searchInput");
+
+function createCard(cam) {
+  const card = document.createElement("div");
+  card.className = "bg-gray-800 rounded-2xl shadow-lg overflow-hidden";
+
+  const header = document.createElement("div");
+  header.className = "p-3 flex justify-between items-center";
+
+  const title = document.createElement("span");
+  title.textContent = cam.name;
+
+  const status = document.createElement("span");
+  status.textContent = "Loading...";
+  status.className = "text-sm";
+
+  header.appendChild(title);
+  header.appendChild(status);
+
+  const iframe = document.createElement("iframe");
+  iframe.src = cam.url;
+  iframe.className = "w-full h-64";
+
+  iframe.onload = () => {
+    status.textContent = "● Online";
+    status.className = "text-green-400 text-sm";
+  };
+
+  iframe.onerror = () => {
+    status.textContent = "● Offline";
+    status.className = "text-red-400 text-sm";
+  };
+
+  // fallback timeout (kalau blank)
+  setTimeout(() => {
+    if (status.textContent === "Loading...") {
+      status.textContent = "● Unknown";
+      status.className = "text-yellow-400 text-sm";
+    }
+  }, 5000);
+
+  card.appendChild(header);
+  card.appendChild(iframe);
+
+  return card;
+}
+
+function render(filter = "") {
+  grid.innerHTML = "";
+  cameras
+    .filter(cam => cam.name.toLowerCase().includes(filter.toLowerCase()))
+    .forEach(cam => grid.appendChild(createCard(cam)));
+}
+
+searchInput.addEventListener("input", (e) => {
+  render(e.target.value);
+});
+
+render();
+</script>
+
+</body>
+</html>
