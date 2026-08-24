@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOTP Manager</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #121212;
+        color: white;
+        font-family: Arial, sans-serif;
+        margin: 0;
+      }
+
+      /* =========================
+   LOGIN
+========================= */
+      #loginScreen {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .login-box {
+        width: 100%;
+        max-width: 450px;
+        background: #1e1e1e;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow:
+          0 10px 40px rgba(0, 0, 0, .5);
+      }
+
+      .login-box h1 {
+        text-align: center;
+        margin-bottom: 8px;
+      }
+
+      .login-box p {
+        text-align: center;
+        color: #888;
+        margin-bottom: 25px;
+      }
+
+      /* AUTH BUTTON CONTAINER */
+      .auth-options {
+        display: grid;
+        grid-template-columns:
+          repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      /* AUTH BUTTON */
+      .auth-option {
+        padding: 15px 10px;
+        border: 1px solid #333;
+        border-radius: 10px;
+        background: #252525;
+        color: white;
+        cursor: pointer;
+        text-align: center;
+        transition: .2s;
+      }
+
+      .auth-option:hover {
+        background: #303030;
+      }
+
+      .auth-option.active {
+        background: #173b55;
+        border-color: #2196f3;
+      }
+
+      .auth-icon {
+        display: block;
+        font-size: 25px;
+        margin-bottom: 5px;
+      }
+
+      /* PASSWORD */
+      #passwordInput {
+        width: 100%;
+        padding: 13px;
+        border-radius: 8px;
+        border: 1px solid #333;
+        background: #121212;
+        color: white;
+        outline: none;
+        margin-bottom: 12px;
+      }
+
+      #passwordInput:focus {
+        border-color: #2196f3;
+      }
+
+      /* LOGIN BUTTON */
+      .login-btn {
+        width: 100%;
+        padding: 13px;
+        border: none;
+        border-radius: 8px;
+        background: #2196f3;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .login-btn:hover {
+        background: #1976d2;
+      }
+
+      #loginError {
+        display: none;
+        color: #ff5252;
+        text-align: center;
+        margin-top: 12px;
+      }
+
+      /* =========================
+   APP
+========================= */
+      #app {
+        display: none;
+      }
+
+      /* HEADER */
+      header {
+        padding: 15px 20px;
+        background: #1f1f1f;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .header-title {
+        flex: 1;
+      }
+
+      .header-title h2 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .header-title span {
+        color: #888;
+        font-size: 12px;
+      }
+
+      /* SEARCH */
+      #search {
+        padding: 10px;
+        border-radius: 7px;
+        border: none;
+        width: 250px;
+        background: #2a2a2a;
+        color: white;
+        outline: none;
+      }
+
+      /* LOGOUT */
+      .logout-btn {
+        padding: 10px 15px;
+        background: #d32f2f;
+        color: white;
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+      }
+
+      .logout-btn:hover {
+        background: #b71c1c;
+      }
+
+      /* =========================
+   TOTP
+========================= */
+      .container {
+        display: grid;
+        grid-template-columns:
+          repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+      }
+
+      .card {
+        background: #1e1e1e;
+        border-radius: 12px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        transition: .2s;
+      }
+
+      .card:hover {
+        transform:
+          translateY(-4px);
+        box-shadow:
+          0 4px 15px rgba(0, 0, 0, .4);
+      }
+
+      .issuer {
+        font-size: 1.1rem;
+        font-weight: bold;
+      }
+
+      .account {
+        font-size: .9rem;
+        color: #888;
+        word-break: break-all;
+      }
+
+      .otp {
+        font-size: 2rem;
+        font-weight: bold;
+        letter-spacing: 3px;
+        text-align: center;
+        margin: 8px 0;
+      }
+
+      .countdown {
+        text-align: right;
+        font-size: 12px;
+        color: #999;
+      }
+
+      .progress {
+        height: 5px;
+        background: #333;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background:
+          linear-gradient(90deg,
+            #4cafef,
+            #2196f3);
+        transition:
+          width 1s linear;
+      }
+
+      .copy-btn {
+        margin-top: .5rem;
+        padding: .6rem;
+        background: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .copy-btn:hover {
+        background: #1976d2;
+      }
+
+      .copy-btn.copied {
+        background: #4caf50;
+      }
+
+      .empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: #777;
+        padding: 50px;
+      }
+
+      /* MOBILE */
+      @media(max-width:700px) {
+        header {
+          flex-wrap: wrap;
+        }
+
+        .header-title {
+          width: 100%;
+        }
+
+        #search {
+          width: 100%;
+          order: 3;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- =====================================================
+     LOGIN SCREEN
+===================================================== -->
+    <div id="loginScreen">
+      <div class="login-box">
+        <h1>🔐 TOTP Manager</h1>
+        <p> Pilih akses yang ingin digunakan </p>
+        <!--
+
+      BUTTON AUTH AKAN DIBUAT
+      OTOMATIS DARI authGroups
+
+    -->
+        <div id="authOptions" class="auth-options"></div>
+        <input type="password" id="passwordInput" placeholder="Masukkan password" autocomplete="off">
+        <button class="login-btn" onclick="login()"> Login </button>
+        <div id="loginError"> Password salah! </div>
+      </div>
+    </div>
+    <!-- =====================================================
+     APPLICATION
+===================================================== -->
+    <div id="app">
+      <header>
+        <div class="header-title">
+          <h2 id="accessTitle"> TOTP </h2>
+          <span id="accountCount"></span>
+        </div>
+        <input type="text" id="search" placeholder="Search issuer/account...">
+        <button class="logout-btn" onclick="logout()"> Logout </button>
+      </header>
+      <div class="container" id="totpList"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/3.2.0/sha.js"></script>
+    <script>
+      /* =====================================================
+   AUTH GROUPS
+===================================================== */
+      /*
+
+        TAMBAHKAN KATEGORI DI SINI.
+
+        Tidak perlu mengubah HTML.
+
+      */
+      const authGroups = [{
+        id: "office",
+        title: "🏢 Kantor",
+        password: "150123"
+      }, {
+        id: "personal",
+        title: "👤 Pribadi",
+        password: "123150"
+      }
+      ]
+      /* =====================================================
+         TOTP SECRETS
+      ===================================================== */
+      /*
+
+        group HARUS sama dengan id authGroups.
+
+      */
+      const secrets = [
+        /* =====================
+           KANTOR
+        ===================== */
+        {
+          group: "office",
+          secret: "RDKE6NFSB37FAS74FBTDPNF4U42XWE6D",
+          issuer: "AWS Secret",
+          account: "techfe-kristian"
+        }, {
+          group: "office",
+          secret: "odgluctjssjfleh46pp3xio7xzrnijmp",
+          issuer: "Google",
+          account: "kristian.wijaya@ruparupa.com"
+        }, {
+          group: "office",
+          secret: "OBV2U6MUPYEO6K7PGYOIWS4SC7ADQSMU",
+          issuer: "Moeagage",
+          account: "kristian.wijaya@ruparupa.com"
+        }, {
+          group: "office",
+          secret: "WO55TYAVBCTCXOEEUQC3JTNQGISB6UJK",
+          issuer: "Gideon Production",
+          account: "kristian@ruparupa.com"
+        }, {
+          group: "office",
+          secret: "AS4XOEG3HDVK3JO5J5RRS7TCX24UJC7E",
+          issuer: "OMS/Marketing Production",
+          account: "kristian2@ruparupa.com"
+        }, {
+          group: "office",
+          secret: "6YQGJWWV3HFCKNWQBSEHHJOPOVKARNLK",
+          issuer: "Postmark",
+          account: "kristian.wijaya@ruparupa.com"
+        }, {
+          group: "office",
+          secret: "USA7GDAAHIVOVHOI6R7BHC6T2CNFW6O6",
+          issuer: "ruparupa-production",
+          account: "kristian@new-teleport.rupasecops.com"
+        }, {
+          group: "office",
+          secret: "NNHGU3KSMNLGSRRXM47SWSK5GRGHOXD2",
+          issuer: "Atlassian",
+          account: "kristian.wijaya@ruparupa.com"
+        }, {
+          group: "office",
+          secret: "NO2XLVSJRXHI65NRVBPCBHRU3KW5FJQS",
+          issuer: "Cloudinary",
+          account: "kristian.wijaya@ruparupa.com"
+        }, {
+          group: "office",
+          secret: "2VRB3BAYAQTSWKPF7QMAP3GRE4FEXK5V",
+          issuer: "ruparupa-production",
+          account: "kristian@teleport.rupasecops.com"
+        }, {
+          group: "office",
+          secret: "CXYV5YELRVBXVZTH3RG66MSYYQ5NUVH7",
+          issuer: "OpenAI",
+          account: "admin@ruparupa.com"
+        }, 
+        /* =====================
+           PERSONAL
+        ===================== */
+        {
+          group: "personal",
+          secret: "7CKLI255TE7UNHB4BE3FSYLMULVCLOTD",
+          issuer: "hub.docker.com",
+          account: "testkpower"
+        },
+        {
+          group: "personal",
+          secret: "aok7hpa4cmjilpx54q5eblxa752ziy7l",
+          issuer: "Google",
+          account: "tech.ruparupa@gmail.com"
+        }, {
+          group: "personal",
+          secret: "IN3GWMKLGBWDA4JB",
+          issuer: "Tokocrypto",
+          account: "kristian.handoko@yahoo.co.id"
+        }
+      ];
+      const period = 30;
+      let currentAuth = null;
+      /* =====================================================
+         CREATE AUTH BUTTONS
+      ===================================================== */
+      function createAuthButtons() {
+        const container = document.getElementById("authOptions");
+        container.innerHTML = "";
+        authGroups.forEach((group, index) => {
+          const button = document.createElement("div");
+          button.className = "auth-option";
+          if (index === 0) {
+            button.classList.add("active");
+            currentAuth = group.id;
+          }
+          button.dataset.group = group.id;
+          button.innerHTML = `
+
+      
+							
+							<span class="auth-icon">
+        ${getIcon(group.title)}
+      </span>
+
+      ${escapeHTML(
+        removeEmoji(group.title)
+      )}
+
+    `;
+          button.onclick = () => {
+            selectAuth(group.id);
+          };
+          container.appendChild(button);
+        });
+      }
+      /* =====================================================
+         ICON
+      ===================================================== */
+      function getIcon(title) {
+        const match = title.match(/[\u{1F300}-\u{1FAFF}]/u);
+        return match ? match[0] : "🔐";
+      }
+      /* =====================================================
+         REMOVE EMOJI
+      ===================================================== */
+      function removeEmoji(text) {
+        return text.replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
+      }
+      /* =====================================================
+         SELECT AUTH
+      ===================================================== */
+      function selectAuth(groupId) {
+        currentAuth = groupId;
+        document.querySelectorAll(".auth-option").forEach(button => {
+          button.classList.toggle("active", button.dataset.group === groupId);
+        });
+        document.getElementById("passwordInput").value = "";
+        document.getElementById("loginError").style.display = "none";
+        document.getElementById("passwordInput").focus();
+      }
+      /* =====================================================
+         LOGIN
+      ===================================================== */
+      function login() {
+        const group = authGroups.find(item => item.id === currentAuth);
+        if (!group) {
+          alert("Auth group tidak ditemukan");
+          return;
+        }
+        const password = document.getElementById("passwordInput").value;
+        if (password === group.password) {
+          document.getElementById("loginScreen").style.display = "none";
+          document.getElementById("app").style.display = "block";
+          document.getElementById("accessTitle").innerText = group.title;
+          renderList();
+        } else {
+          document.getElementById("loginError").style.display = "block";
+        }
+      }
+      /* =====================================================
+         ENTER LOGIN
+      ===================================================== */
+      document.getElementById("passwordInput").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+          login();
+        }
+      });
+      /* =====================================================
+         LOGOUT
+      ===================================================== */
+      function logout() {
+        document.getElementById("app").style.display = "none";
+        document.getElementById("loginScreen").style.display = "flex";
+        document.getElementById("passwordInput").value = "";
+        document.getElementById("search").value = "";
+      }
+      /* =====================================================
+         BASE32 → HEX
+      ===================================================== */
+      function base32toHex(base32) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+        let bits = "";
+        let hex = "";
+        base32 = base32.replace(/=+$/, "").replace(/\s/g, "");
+        for (let i = 0; i < base32.length; i++) {
+          const value = chars.indexOf(base32.charAt(i).toUpperCase());
+          if (value < 0) continue;
+          bits += value.toString(2).padStart(5, "0");
+        }
+        for (let i = 0; i + 4 <= bits.length; i += 4) {
+          hex += parseInt(bits.substr(i, 4), 2).toString(16);
+        }
+        return hex;
+      }
+      /* =====================================================
+         GENERATE TOTP
+      ===================================================== */
+      function generateTOTP(secret) {
+        const epoch = Math.floor(Date.now() / 1000);
+        const time = Math.floor(epoch / period);
+        const timeHex = time.toString(16).padStart(16, "0");
+        const key = base32toHex(secret);
+        const shaObj = new jsSHA("SHA-1", "HEX");
+        shaObj.setHMACKey(key, "HEX");
+        shaObj.update(timeHex);
+        const hmac = shaObj.getHMAC("HEX");
+        const offset = parseInt(hmac.substring(hmac.length - 1), 16);
+        const binary = parseInt(hmac.substr(offset * 2, 8), 16);
+        const otp = (binary & 0x7fffffff).toString();
+        return otp.padStart(6, "0").slice(-6);
+      }
+      /* =====================================================
+         RENDER
+      ===================================================== */
+      function renderList() {
+        const container = document.getElementById("totpList");
+        const search = document.getElementById("search").value.toLowerCase();
+        const filtered = secrets.filter(item => item.group === currentAuth && (item.issuer.toLowerCase().includes(search) || item.account.toLowerCase().includes(search)));
+        container.innerHTML = "";
+        document.getElementById("accountCount").innerText = `${filtered.length} account`;
+        if (!filtered.length) {
+          container.innerHTML = `
+
+      
+							
+							<div class="empty">
+
+        Tidak ada account ditemukan.
+
+      </div>
+
+    `;
+          return;
+        }
+        const now = Math.floor(Date.now() / 1000);
+        const remain = period - (now % period);
+        const progress = (1 - remain / period) * 100;
+        filtered.forEach(item => {
+          const otp = generateTOTP(item.secret);
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+
+      
+							
+							<div class="issuer">
+
+        ${escapeHTML(
+          item.issuer
+        )}
+
+      </div>
+							<div class="account">
+
+        ${escapeHTML(
+          item.account
+        )}
+
+      </div>
+							<div class="otp">
+
+        ${otp}
+
+      </div>
+							<div class="countdown">
+
+        ${remain}s
+
+      </div>
+							<div class="progress">
+								<div
+          class="progress-bar"
+          style="width:${progress}%"></div>
+							</div>
+							<button
+        class="copy-btn">
+
+        📋 Copy OTP
+
+      </button>
+
+    `;
+          const copyButton = card.querySelector(".copy-btn");
+          copyButton.onclick = async () => {
+            try {
+              await navigator.clipboard.writeText(otp);
+              copyButton.innerText = "✓ Copied";
+              copyButton.classList.add("copied");
+              setTimeout(() => {
+                copyButton.innerText = "📋 Copy OTP";
+                copyButton.classList.remove("copied");
+              }, 1000);
+            } catch {
+              alert("Gagal menyalin OTP");
+            }
+          };
+          container.appendChild(card);
+        });
+      }
+      /* =====================================================
+         ESCAPE HTML
+      ===================================================== */
+      function escapeHTML(value) {
+        return String(value).replace(/&/g, "&amp;").replace(/  < /g,
+          "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      }
+      /* =====================================================
+         SEARCH
+      ===================================================== */
+      document.getElementById("search").addEventListener("input", renderList);
+      /* =====================================================
+         START
+      ===================================================== */
+      createAuthButtons();
+      /* =====================================================
+         REFRESH OTP
+      ===================================================== */
+      setInterval(() => {
+        if (document.getElementById("app").style.display === "block") {
+          renderList();
+        }
+      }, 1000);
+    </script>
+  </body>
+</html>
